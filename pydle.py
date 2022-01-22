@@ -7,42 +7,55 @@ valid_guesses = ["aahed", "aalii", "aargh", "aarti", "abaca", "abaci", "abacs", 
 
 def play_game():
     secret_word = random.choice(answers)
-    print("God mode: the secret word is " + secret_word)
     num_guesses = 0
     guesses = []
     while num_guesses<6:
         if guesses:
             for row in guesses:
                 print(row)
-        play_round(secret_word, num_guesses,guesses)
-        
+        num_guesses = play_round(secret_word, num_guesses,guesses)
+    if num_guesses>=6:
+        print("Sorry, you failed to guess the word. The word was {}.".format(secret_word.upper()))
+        again = input("Play again? (Y/N)").upper()
+        if again == "Y":
+            play_game()
+        else:
+            return
     
 
 
 
 def play_round(secret_word,num_guesses,boxes):
-    guess = input("Guess a word:").lower()
-    if guess in valid_guesses or answers:
+    guess = input("Guess a word ({} guesses remaining):".format(6-num_guesses)).lower()
+    if guess in valid_guesses or guess in answers:
         result = compare_guess_to_word(secret_word,guess)
         num_guesses+=1
         boxes.append(result)
-        return
+        return num_guesses
     else:
         print("That's not a valid, five-letter English word. Guess again.")
-        return None
+        return num_guesses
 
 
 def compare_guess_to_word(secret_word,guess):
     result = ""
     for letter in guess:
         if guess.find(letter) == secret_word.find(letter):
-          result += letter
+          result += letter.upper()
         elif letter in secret_word and guess.find(letter)!= secret_word.find(letter):
-            result+= "≣"
+            result+= "🮮"
         elif letter not in secret_word:
             result+= "▓"
-    if "≣" not in result and "▓" not in result:
+        guess=guess[1:]
+        secret_word=secret_word[1:]
+    if "🮮" not in result and "▓" not in result:
         print("You win")
+        again = input("Play again? (Y/N)").upper()
+        if again == "Y":
+            play_game()
+        else:
+            exit()
+
     else:
         return result
 
